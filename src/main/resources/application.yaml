@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: carnet-de-sante
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carnet_de_sante
+    username: postgres
+    password: Gunnersfan.33
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate  # ✅ IMPORTANT
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true  # ✅ IMPORTANT
+    change-log: classpath:db/changelog/db.changelog-master.yaml  # ✅ Chemin exact
+    default-schema: public
+
+logging:
+  level:
+    root: INFO
+    com.example.carnet_de_sante: DEBUG
+    liquibase: DEBUG  # ✅ Pour voir les logs Liquibase
