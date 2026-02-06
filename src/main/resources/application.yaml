@@ -19,7 +19,7 @@ spring:
 
   liquibase:
     enabled: true  # ✅ IMPORTANT
-    change-log: classpath:db/changelog/db.changelog-master.yaml  # ✅ Chemin exact
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
     default-schema: public
 
 logging:

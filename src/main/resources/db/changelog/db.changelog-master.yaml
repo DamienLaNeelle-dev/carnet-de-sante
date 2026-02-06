@@ -1,6 +1,6 @@
 # =====================================================
 # Liquibase Changelog Master - Carnet de Santé
-# Version corrigée avec tous les attributs
+# Version corrigée - Compatible Liquibase Open Source
 # =====================================================
 
 databaseChangeLog:
@@ -54,10 +54,8 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: TIMESTAMP
-        - addCheckConstraint:
-            constraintName: chk_users_role
-            tableName: users
-            checkConstraint: "role IN ('PATIENT', 'MEDECIN', 'ADMIN')"
+        - sql:
+            sql: ALTER TABLE users ADD CONSTRAINT chk_users_role CHECK (role IN ('PATIENT', 'MEDECIN', 'ADMIN'))
         - createIndex:
             indexName: idx_users_email
             tableName: users
@@ -142,18 +140,12 @@ databaseChangeLog:
             referencedTableName: users
             referencedColumnNames: id
             onDelete: CASCADE
-        - addCheckConstraint:
-            constraintName: chk_date_naissance_passee
-            tableName: patients
-            checkConstraint: "date_naissance <= CURRENT_DATE"
-        - addCheckConstraint:
-            constraintName: chk_date_naissance_realiste
-            tableName: patients
-            checkConstraint: "date_naissance >= CURRENT_DATE - INTERVAL '150 years'"
-        - addCheckConstraint:
-            constraintName: chk_groupe_sanguin_valide
-            tableName: patients
-            checkConstraint: "groupe_sanguin IS NULL OR groupe_sanguin IN ('A_POSITIF', 'A_NEGATIF', 'B_POSITIF', 'B_NEGATIF', 'AB_POSITIF', 'AB_NEGATIF', 'O_POSITIF', 'O_NEGATIF')"
+        - sql:
+            sql: ALTER TABLE patients ADD CONSTRAINT chk_date_naissance_passee CHECK (date_naissance <= CURRENT_DATE)
+        - sql:
+            sql: ALTER TABLE patients ADD CONSTRAINT chk_date_naissance_realiste CHECK (date_naissance >= CURRENT_DATE - INTERVAL '150 years')
+        - sql:
+            sql: ALTER TABLE patients ADD CONSTRAINT chk_groupe_sanguin_valide CHECK (groupe_sanguin IS NULL OR groupe_sanguin IN ('A_POSITIF', 'A_NEGATIF', 'B_POSITIF', 'B_NEGATIF', 'AB_POSITIF', 'AB_NEGATIF', 'O_POSITIF', 'O_NEGATIF'))
         - createIndex:
             indexName: idx_patients_user_id
             tableName: patients
@@ -247,10 +239,8 @@ databaseChangeLog:
             referencedTableName: users
             referencedColumnNames: id
             onDelete: CASCADE
-        - addCheckConstraint:
-            constraintName: chk_medecin_specialite
-            tableName: medecins
-            checkConstraint: "specialite IN ('GENERALISTE', 'CARDIOLOGUE', 'DERMATOLOGUE', 'PEDIATRE', 'GYNECO', 'OPHTALMOLOGUE', 'ORL', 'PSYCHIATRE', 'RADIOLOGUE', 'CHIRURGIEN')"
+        - sql:
+            sql: ALTER TABLE medecins ADD CONSTRAINT chk_medecin_specialite CHECK (specialite IN ('GENERALISTE', 'CARDIOLOGUE', 'DERMATOLOGUE', 'PEDIATRE', 'GYNECO', 'OPHTALMOLOGUE', 'ORL', 'PSYCHIATRE', 'RADIOLOGUE', 'CHIRURGIEN'))
         - createIndex:
             indexName: idx_medecins_user_id
             tableName: medecins
@@ -441,10 +431,8 @@ databaseChangeLog:
             referencedTableName: medecins
             referencedColumnNames: id
             onDelete: RESTRICT
-        - addCheckConstraint:
-            constraintName: chk_ordonnance_statut
-            tableName: ordonnances
-            checkConstraint: "statut IN ('ACTIVE', 'ARCHIVEE', 'ANNULEE')"
+        - sql:
+            sql: ALTER TABLE ordonnances ADD CONSTRAINT chk_ordonnance_statut CHECK (statut IN ('ACTIVE', 'ARCHIVEE', 'ANNULEE'))
         - createIndex:
             indexName: idx_ordonnances_patient
             tableName: ordonnances
@@ -602,10 +590,8 @@ databaseChangeLog:
             referencedTableName: medecins
             referencedColumnNames: id
             onDelete: CASCADE
-        - addCheckConstraint:
-            constraintName: chk_rdv_statut
-            tableName: rendez_vous
-            checkConstraint: "statut IN ('PLANIFIE', 'CONFIRME', 'ANNULE', 'TERMINE', 'ABSENT')"
+        - sql:
+            sql: ALTER TABLE rendez_vous ADD CONSTRAINT chk_rdv_statut CHECK (statut IN ('PLANIFIE', 'CONFIRME', 'ANNULE', 'TERMINE', 'ABSENT'))
         - createIndex:
             indexName: idx_rdv_patient
             tableName: rendez_vous
@@ -705,10 +691,8 @@ databaseChangeLog:
             referencedTableName: medecins
             referencedColumnNames: id
             onDelete: CASCADE
-        - addCheckConstraint:
-            constraintName: chk_partage_niveau_acces
-            tableName: partage_dossiers
-            checkConstraint: "niveau_acces IN ('LECTURE', 'ECRITURE')"
+        - sql:
+            sql: ALTER TABLE partage_dossiers ADD CONSTRAINT chk_partage_niveau_acces CHECK (niveau_acces IN ('LECTURE', 'ECRITURE'))
         - createIndex:
             indexName: idx_partage_patient_medecin
             tableName: partage_dossiers
@@ -792,10 +776,8 @@ databaseChangeLog:
             referencedTableName: users
             referencedColumnNames: id
             onDelete: SET NULL
-        - addCheckConstraint:
-            constraintName: chk_log_type_utilisateur
-            tableName: logs_acces_dossier
-            checkConstraint: "type_utilisateur IN ('PATIENT', 'MEDECIN', 'ADMIN')"
+        - sql:
+            sql: ALTER TABLE logs_acces_dossier ADD CONSTRAINT chk_log_type_utilisateur CHECK (type_utilisateur IN ('PATIENT', 'MEDECIN', 'ADMIN'))
         - createIndex:
             indexName: idx_logs_patient
             tableName: logs_acces_dossier
