@@ -1,13 +1,4 @@
-# =====================================================
-# Liquibase Changelog Master - Carnet de Santé
-# Version corrigée - Compatible Liquibase Open Source
-# =====================================================
-
 databaseChangeLog:
-
-  # ===================================================
-  # V1 : Table USERS (Authentification)
-  # ===================================================
   - changeSet:
       id: 1-create-users-table
       author: damien
