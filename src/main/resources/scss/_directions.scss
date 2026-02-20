@@ -1,0 +1,65 @@
+@mixin total-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    }
+
+@mixin justify-content{
+    display: flex;
+    justify-content: center;
+    }
+
+@mixin row{
+    display: flex;
+    flex-direction: row
+    }
+
+@mixin column{
+    display: flex;
+    flex-direction: column
+    }
+
+@mixin space-between{
+    display: flex;
+    justify-content : space-between
+    }
+
+@mixin space-around{
+    display: flex;
+    justify-content : space-around
+    }
+
+@mixin space-evenly{
+    display: flex;
+    justify-content : space-evenly
+    }
+
+.total-center{
+    @include total-center
+    }
+
+.justify-content{
+    @include justify-content
+    }
+
+.row{
+    @include row
+    }
+
+.column{
+    @include column
+    }
+
+.space-between{
+    @include space-between
+    }
+
+.space-around{
+    @include space-around
+    }
+
+.space-evenly{
+    @include space-evenly
+    }

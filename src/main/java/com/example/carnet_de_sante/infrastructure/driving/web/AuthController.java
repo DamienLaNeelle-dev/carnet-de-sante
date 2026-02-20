@@ -1,12 +1,12 @@
 package com.example.carnet_de_sante.infrastructure.driving.web;
 
-import com.example.carnet_de_sante.application.dto.RegisterMedecinRequest;
+import com.example.carnet_de_sante.application.dto.LoginRequest;
+import com.example.carnet_de_sante.application.dto.LoginResponse;
 import com.example.carnet_de_sante.application.dto.RegisterPatientRequest;
+import com.example.carnet_de_sante.application.service.AuthService;
 import com.example.carnet_de_sante.application.service.UserService;
-import com.example.carnet_de_sante.domain.model.Medecin;
 import com.example.carnet_de_sante.domain.model.Patient;
 import com.example.carnet_de_sante.domain.model.User;
-import com.example.carnet_de_sante.domain.port.MedecinRepository;
 import com.example.carnet_de_sante.domain.port.PatientRepository;
 import com.example.carnet_de_sante.domain.port.UserRepository;
 import jakarta.validation.Valid;
@@ -23,15 +23,35 @@ import java.util.List;
 public class AuthController {
 
     private final UserService userService;
+    private final AuthService authService;
     private final UserRepository userRepository;
-    private final MedecinRepository medecinRepository;
     private final PatientRepository patientRepository;
 
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    /**
+     * Endpoint de test
+     */
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("API Carnet de Santé - Opérationnelle ✅");
     }
 
+    /**
+     * Login - Authentification et génération du token JWT
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            LoginResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Email ou mot de passe incorrect");
+        }
+    }
+
+    /**
+     * Inscription d'un nouveau patient
+     */
     @PostMapping("/register/patient")
     public ResponseEntity<Patient> registerPatient(@Valid @RequestBody RegisterPatientRequest request) {
         try {
@@ -42,28 +62,19 @@ public class AuthController {
         }
     }
 
+    /**
+     * Liste de tous les utilisateurs
+     */
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    /**
+     * Liste de tous les patients
+     */
     @GetMapping("/register/patients")
     public List<Patient> getAllPatients() {
         return patientRepository.findAll();
-    }
-
-    @PostMapping("/register/medecin")
-    public ResponseEntity<Medecin> registerMedecin(@Valid @RequestBody RegisterMedecinRequest request) {
-        try {
-            Medecin medecin = userService.creerMedecin(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(medecin);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-    }
-
-    @GetMapping("/register/medecins")
-    public List<Medecin> getAllMedecins() {
-        return medecinRepository.findAll();
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("API Carnet de Santé - Opérationnelle ✅");
     }
 }

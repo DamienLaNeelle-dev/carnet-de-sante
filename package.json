@@ -1,0 +1,17 @@
+{
+  "name": "carnet-de-sante",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sass": "sass src/main/resources/scss/main.scss src/main/resources/static/css/style.css",
+    "sass:watch": "sass --watch src/main/resources/scss:src/main/resources/static/css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.97.3"
+  }
+}

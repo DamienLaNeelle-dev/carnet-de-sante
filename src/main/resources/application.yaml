@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate  # ✅ IMPORTANT
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -18,12 +18,16 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   liquibase:
-    enabled: true  # ✅ IMPORTANT
+    enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     default-schema: public
+
+jwt:
+  secret: Y2FybmV0X2RlX3NhbnRlX3NlY3JldF9rZXlfMjAyNl92ZXJ5X3NlY3VyZV9kb19ub3RfdXNlX2luX3Byb2R1Y3Rpb24=
+  expiration: 86400000
 
 logging:
   level:
     root: INFO
     com.example.carnet_de_sante: DEBUG
-    liquibase: DEBUG  # ✅ Pour voir les logs Liquibase
+    liquibase: DEBUG
