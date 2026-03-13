@@ -1,0 +1,73 @@
+<header class="dashboard-header">
+  <div class="app-container">
+    <div class="header-content">
+      <h1 class="title">Mon Carnet de Sante</h1>
+      <div class="user-info">
+        <span>{{ userName }}</span>
+        <button class="btn-logout" type="button" (click)="logout()">
+          Deconnexion
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-main">
+  <div class="app-container">
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+
+    <section class="dashboard-section">
+      <h2 class="title">Mes informations</h2>
+      <div class="info-card">
+        <div class="info-row">
+          <span class="info-label">Nom :</span>
+          <span class="info-value">{{ patient?.nom ?? "-" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Prenom :</span>
+          <span class="info-value">{{ patient?.prenom ?? "-" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date de naissance :</span>
+          <span class="info-value">{{
+            formatDate(patient?.dateNaissance)
+          }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email :</span>
+          <span class="info-value">{{ userEmail || "-" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Groupe sanguin :</span>
+          <span class="info-value">{{
+            formatBloodGroup(patient?.groupeSanguin)
+          }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Numero de securite sociale :</span>
+          <span class="info-value">{{
+            formatNumeroSecu(patient?.numeroSecu)
+          }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="title">Mes consultations</h2>
+      <div class="empty-state">
+        <p>Aucune consultation pour le moment</p>
+        <small>Cette fonctionnalite sera bientot disponible</small>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="title">Mes ordonnances</h2>
+      <div class="empty-state">
+        <p>Aucune ordonnance pour le moment</p>
+        <small>Cette fonctionnalite sera bientot disponible</small>
+      </div>
+    </section>
+  </div>
+</main>

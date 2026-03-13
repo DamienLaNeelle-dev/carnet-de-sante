@@ -1,0 +1,48 @@
+<div class="total-center">
+  <div class="form-container">
+    <div class="form-header">
+      <h1 class="title">Connexion</h1>
+      <p>Accedez a votre carnet de sante</p>
+    </div>
+
+    <form class="form" (ngSubmit)="onSubmit()">
+      <div class="app-form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="votre.email@exemple.com"
+          [(ngModel)]="email"
+          required
+        />
+      </div>
+
+      <div class="app-form-group">
+        <label for="password">Mot de passe</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="********"
+          [(ngModel)]="password"
+          required
+        />
+      </div>
+
+      @if (errorMessage) {
+        <p class="error-message">{{ errorMessage }}</p>
+      }
+
+      <div class="form-actions">
+        <button type="submit" class="app-btn" [disabled]="isSubmitting">
+          {{ isSubmitting ? "Connexion..." : "Se connecter" }}
+        </button>
+      </div>
+
+      <div class="form-footer">
+        <p>Pas encore de compte ? <a href="/register">S'inscrire</a></p>
+      </div>
+    </form>
+  </div>
+</div>

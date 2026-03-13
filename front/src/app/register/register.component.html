@@ -1,0 +1,134 @@
+<div class="total-center">
+  <div class="form-container">
+    <div class="form-header">
+      <h1 class="title">Creer mon compte</h1>
+      <p>Gerez votre sante en ligne</p>
+    </div>
+
+    <form class="form" (ngSubmit)="onSubmit()">
+      <div class="app-form-group">
+        <label for="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="votre.email@exemple.com"
+          [(ngModel)]="formData.email"
+          required
+        />
+      </div>
+
+      <div class="app-form-group">
+        <label for="password">Mot de passe *</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Minimum 8 caracteres"
+          minlength="8"
+          [(ngModel)]="formData.password"
+          required
+        />
+      </div>
+
+      <div class="app-form-row">
+        <div class="app-form-group">
+          <label for="nom">Nom *</label>
+          <input
+            type="text"
+            id="nom"
+            name="nom"
+            placeholder="Dupont"
+            [(ngModel)]="formData.nom"
+            required
+          />
+        </div>
+
+        <div class="app-form-group">
+          <label for="prenom">Prenom *</label>
+          <input
+            type="text"
+            id="prenom"
+            name="prenom"
+            placeholder="Jean"
+            [(ngModel)]="formData.prenom"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="app-form-group">
+        <label for="dateNaissance">Date de naissance *</label>
+        <input
+          type="date"
+          id="dateNaissance"
+          name="dateNaissance"
+          [(ngModel)]="formData.dateNaissance"
+          required
+        />
+      </div>
+
+      <div class="app-form-group">
+        <label for="numeroSecu">Numero de securite sociale *</label>
+        <input
+          type="text"
+          id="numeroSecu"
+          name="numeroSecu"
+          placeholder="123456789012345"
+          pattern="[0-9]{15}"
+          title="15 chiffres requis"
+          [(ngModel)]="formData.numeroSecu"
+          required
+        />
+      </div>
+
+      <div class="app-form-group">
+        <label for="groupeSanguin">Groupe sanguin</label>
+        <select
+          id="groupeSanguin"
+          name="groupeSanguin"
+          [(ngModel)]="formData.groupeSanguin"
+        >
+          <option value="">Selectionner (optionnel)</option>
+          <option value="A_POSITIF">A+</option>
+          <option value="A_NEGATIF">A-</option>
+          <option value="B_POSITIF">B+</option>
+          <option value="B_NEGATIF">B-</option>
+          <option value="AB_POSITIF">AB+</option>
+          <option value="AB_NEGATIF">AB-</option>
+          <option value="O_POSITIF">O+</option>
+          <option value="O_NEGATIF">O-</option>
+        </select>
+      </div>
+
+      <div class="app-form-group">
+        <label for="contactUrgence">Contact d'urgence</label>
+        <input
+          type="text"
+          id="contactUrgence"
+          name="contactUrgence"
+          placeholder="Nom et telephone"
+          [(ngModel)]="formData.contactUrgence"
+        />
+      </div>
+
+      @if (errorMessage) {
+        <p class="error-message">{{ errorMessage }}</p>
+      }
+
+      @if (successMessage) {
+        <p class="success-message">{{ successMessage }}</p>
+      }
+
+      <div class="form-actions">
+        <button type="submit" class="app-btn" [disabled]="isSubmitting">
+          {{ isSubmitting ? "Creation..." : "Creer mon compte" }}
+        </button>
+      </div>
+    </form>
+
+    <div class="form-footer">
+      <p>Deja un compte ? <a href="/login">Se connecter</a></p>
+    </div>
+  </div>
+</div>

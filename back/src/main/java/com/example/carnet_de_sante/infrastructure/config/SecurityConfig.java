@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/patients/**").authenticated()
+                        .requestMatchers("/api/patients/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
