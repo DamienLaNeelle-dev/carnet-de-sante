@@ -52,7 +52,7 @@ public class UserService {
     }
 
     public Patient getPatientProfile(Long userId) {
-        return patientRepository.findByUserId(userId)
+        return patientRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Profil patient non trouvé"));
     }
 }

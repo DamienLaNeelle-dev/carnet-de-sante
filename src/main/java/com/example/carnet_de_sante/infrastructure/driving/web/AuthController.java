@@ -6,16 +6,11 @@ import com.example.carnet_de_sante.application.dto.RegisterPatientRequest;
 import com.example.carnet_de_sante.application.service.AuthService;
 import com.example.carnet_de_sante.application.service.UserService;
 import com.example.carnet_de_sante.domain.model.Patient;
-import com.example.carnet_de_sante.domain.model.User;
-import com.example.carnet_de_sante.domain.port.PatientRepository;
-import com.example.carnet_de_sante.domain.port.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,8 +19,6 @@ public class AuthController {
 
     private final UserService userService;
     private final AuthService authService;
-    private final UserRepository userRepository;
-    private final PatientRepository patientRepository;
 
     /**
      * Endpoint de test
@@ -62,19 +55,4 @@ public class AuthController {
         }
     }
 
-    /**
-     * Liste de tous les utilisateurs
-     */
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    /**
-     * Liste de tous les patients
-     */
-    @GetMapping("/register/patients")
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
-    }
 }

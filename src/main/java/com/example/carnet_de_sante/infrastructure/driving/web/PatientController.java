@@ -38,7 +38,7 @@ public class PatientController {
      */
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<Patient> getPatientByUserId(@PathVariable Long userId) {
-        return patientRepository.findByUserId(userId)
+        return patientRepository.findByUser_Id(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
