@@ -21,7 +21,6 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public LoginResponse login(LoginRequest request) {
-        // Authentifier l'utilisateur
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -29,17 +28,12 @@ public class AuthService {
                 )
         );
 
-        // Définir l'authentification dans le contexte
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Générer le token JWT
         String token = tokenProvider.generateToken(authentication);
 
-        // Récupérer les infos de l'utilisateur
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-        // Construire la réponse
         return LoginResponse.builder()
                 .token(token)
                 .type("Bearer")

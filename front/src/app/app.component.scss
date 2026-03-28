@@ -1,0 +1,23 @@
+@use "../styles/_global" as *;
+
+.navbar {
+  background-color: $primary-color;
+  font-family: $gill;
+}
+
+.navbar-brand {
+  color: white;
+  font-family: $gill;
+}
+
+.navbar .nav-btn {
+  color: white;
+  margin-right: 10px;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.navbar .nav-btn:hover {
+  transform: scale(1.1);
+}

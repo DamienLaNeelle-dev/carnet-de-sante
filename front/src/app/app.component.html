@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
     <button
       class="navbar-toggler"
@@ -11,7 +11,7 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand" href="#">Carnet de Santé</a>
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
@@ -24,15 +24,11 @@
           <a class="nav-link disabled" aria-disabled="true">Disabled</a>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input
-          class="form-control me-2"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-        />
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+      <a href="/login" class="nav-btn" *ngIf="!isLoggedIn">Connexion</a>
+      <a href="/register" class="nav-btn" *ngIf="!isLoggedIn">Inscription</a>
+      <button class="nav-btn" *ngIf="isLoggedIn" (click)="logout()">
+        Déconnexion
+      </button>
     </div>
   </div>
 </nav>

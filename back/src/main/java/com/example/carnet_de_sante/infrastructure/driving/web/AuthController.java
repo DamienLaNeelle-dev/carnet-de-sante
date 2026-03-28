@@ -20,17 +20,11 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
 
-    /**
-     * Endpoint de test
-     */
     @GetMapping("/test")
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("API Carnet de Santé - Opérationnelle ✅");
     }
 
-    /**
-     * Login - Authentification et génération du token JWT
-     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
@@ -42,9 +36,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Inscription d'un nouveau patient
-     */
     @PostMapping("/register/patient")
     public ResponseEntity<Patient> registerPatient(@Valid @RequestBody RegisterPatientRequest request) {
         try {
