@@ -1,5 +1,6 @@
 package com.example.carnet_de_sante.application.dto;
 
+import com.example.carnet_de_sante.domain.model.Genre;
 import com.example.carnet_de_sante.domain.model.GroupeSanguin;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -19,6 +20,9 @@ public class RegisterPatientRequest {
     @NotBlank(message = "Le mot de passe est obligatoire")
     @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères")
     private String password;
+
+    @NotNull(message = "Le genre est obligatoire")
+    private Genre genre;
     
     @NotBlank(message = "Le nom est obligatoire")
     @Size(max = 100)

@@ -2,12 +2,7 @@
   <div class="app-container">
     <div class="header-content">
       <h1 class="title">Mon Carnet de Sante</h1>
-      <div class="user-info">
-        <span>{{ userName }}</span>
-        <button class="btn-logout" type="button" (click)="logout()">
-          Deconnexion
-        </button>
-      </div>
+      <div class="user-info"></div>
     </div>
   </div>
 </header>
@@ -22,31 +17,35 @@
       <h2 class="title">Mes informations</h2>
       <div class="info-card">
         <div class="info-row">
-          <span class="info-label">Nom :</span>
+          <span class="info-label">Genre : </span>
+          <span class="info-value">{{ formatGenre(patient?.genre) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Nom : </span>
           <span class="info-value">{{ patient?.nom ?? "-" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Prenom :</span>
+          <span class="info-label">Prenom : </span>
           <span class="info-value">{{ patient?.prenom ?? "-" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Date de naissance :</span>
+          <span class="info-label">Date de naissance : </span>
           <span class="info-value">{{
             formatDate(patient?.dateNaissance)
           }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Email :</span>
+          <span class="info-label">Email : </span>
           <span class="info-value">{{ userEmail || "-" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Groupe sanguin :</span>
+          <span class="info-label">Groupe sanguin : </span>
           <span class="info-value">{{
             formatBloodGroup(patient?.groupeSanguin)
           }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Numero de securite sociale :</span>
+          <span class="info-label">Numero de securite sociale : </span>
           <span class="info-value">{{
             formatNumeroSecu(patient?.numeroSecu)
           }}</span>
@@ -55,10 +54,113 @@
     </section>
 
     <section class="dashboard-section">
-      <h2 class="title">Mes consultations</h2>
-      <div class="empty-state">
-        <p>Aucune consultation pour le moment</p>
-        <small>Cette fonctionnalite sera bientot disponible</small>
+      <h2 class="title">Mon médecin traitant</h2>
+      <div class="medecin-traitant">
+        @if (medecin) {
+          <div class="info-card">
+            <div class="info-row">
+              <span class="info-label">Nom : </span>
+              <span class="info-value">{{ medecin.nom }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Prénom : </span>
+              <span class="info-value">{{ medecin.prenom }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Numéro RPPS : </span>
+              <span class="info-value">{{ medecin.numeroRpps }}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="app-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            Modifier le médecin traitant
+          </button>
+        } @else {
+          <!-- Button trigger modal -->
+          <button
+            type="button"
+            class="app-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            Ajouter un médecin traitant
+          </button>
+        }
+      </div>
+
+      <!-- Modal (en dehors du @if/@else pour être toujours accessible) -->
+      <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                @if (medecin) {
+                  Modifier un médecin traitant
+                } @else {
+                  Ajouter un médecin traitant
+                }
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <label for="medecin">Nom du médecin</label>
+              <input
+                type="text"
+                id="medecin"
+                class="form-control"
+                placeholder="Commencez à taper le nom du médecin"
+                [value]="searchQuery"
+                (input)="filterMedecins($any($event.target).value)"
+                required
+              />
+              @if (filteredMedecins.length > 0) {
+                <ul class="list-group mt-2">
+                  @for (med of filteredMedecins; track med.id || med.nom) {
+                    <li
+                      class="list-group-item list-group-item-action"
+                      (click)="selectMedecin(med)"
+                      style="cursor: pointer"
+                    >
+                      <strong>{{ med.nom }} {{ med.prenom }}</strong>
+                      <br />
+                      <small class="text-muted">{{ med.specialite }}</small>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="!selectedMedecinInModal"
+                (click)="saveMedecinTraitant(selectedMedecinInModal!)"
+                aria-label="Close"
+              >
+                @if (medecin) {
+                  Modifier
+                } @else {
+                  Ajouter
+                }
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

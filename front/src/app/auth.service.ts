@@ -5,6 +5,8 @@ import { BehaviorSubject, tap } from 'rxjs';
 interface LoginResponse {
   token: string;
   role: string;
+  email: string;
+  userId: string;
 }
 
 @Injectable({
@@ -23,9 +25,11 @@ export class AuthService {
     return this.httpClient
       .post<LoginResponse>('/api/auth/login', { email, password })
       .pipe(
-        tap((data) => {
+        tap((data: LoginResponse) => {
           localStorage.setItem('token', data.token);
+          localStorage.setItem('email', data.email);
           localStorage.setItem('role', data.role);
+          localStorage.setItem('userId', String(data.userId));
           this.isLoggedIn$.next(true);
         }),
       );

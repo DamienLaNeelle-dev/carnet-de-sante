@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth.service';
-import { NgIf } from '../../node_modules/@angular/common/common_module.d-NEF7UaHr';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NgIf],
+  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
@@ -17,7 +17,9 @@ export class AppComponent {
     private authService: AuthService,
     private router: Router,
   ) {
-    this.authService.isLoggedIn().subscribe((val) => (this.isLoggedIn = val));
+    this.authService
+      .isLoggedIn()
+      .subscribe((val: boolean) => (this.isLoggedIn = val));
   }
 
   logout() {

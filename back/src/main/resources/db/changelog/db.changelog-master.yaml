@@ -158,3 +158,124 @@ databaseChangeLog:
       rollback:
         - dropTable:
             tableName: patients
+
+  # ===================================================
+  # V3 : Ajout colonne genre sur PATIENTS
+  # ===================================================
+  - changeSet:
+      id: 4-add-genre-to-patients
+      author: damien
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: patients
+              columnName: genre
+      changes:
+        - addColumn:
+            tableName: patients
+            columns:
+              - column:
+                  name: genre
+                  type: VARCHAR(10)
+      rollback:
+        - dropColumn:
+            tableName: patients
+            columnName: genre
+
+  # ===================================================
+  # V5 : Ajout table Médecins
+  # ===================================================
+  - changeSet:
+      id: 5-create-medecins-table
+      author: damien
+      changes:
+        - createTable:
+            tableName: medecins
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_medecins
+              - column:
+                  name: nom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prenom
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: specialites
+                  type: VARCHAR(100)
+      rollback:
+        - dropTable:
+            tableName: medecins
+  # ===================================================
+  # V6 : Ajout colonne numeroRpps dans Medecin
+  # ===================================================
+  - changeSet:
+      id: 6-add-column-numeroRpps
+      author: damien
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: medecins
+              columnName: numero_rpps
+      changes:
+        - addColumn:
+            tableName: medecins
+            columns:
+              - column:
+                  name: numero_rpps
+                  type: VARCHAR(11)
+      rollback:
+        - dropColumn:
+            tableName: medecins
+            columnName: numero_rpps
+
+  # ===================================================
+  # V7 : Ajout colonne medecin_id dans Patients (FK vers Medecins)
+  # ===================================================
+  - changeSet:
+      id: 7-add-medecin-traitant-to-patients
+      author: damien
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: patients
+              columnName: medecin_id
+      changes:
+        - addColumn:
+            tableName: patients
+            columns:
+              - column:
+                  name: medecin_id
+                  type: BIGINT
+        - addForeignKeyConstraint:
+            constraintName: fk_patient_medecin_traitant
+            baseTableName: patients
+            baseColumnNames: medecin_id
+            referencedTableName: medecins
+            referencedColumnNames: id
+            onDelete: SET NULL
+        - createIndex:
+            indexName: idx_patients_medecin_id
+            tableName: patients
+            columns:
+              - column:
+                  name: medecin_id
+      rollback:
+        - dropForeignKeyConstraint:
+            constraintName: fk_patient_medecin_traitant
+            baseTableName: patients
+        - dropColumn:
+            tableName: patients
+            columnName: medecin_id

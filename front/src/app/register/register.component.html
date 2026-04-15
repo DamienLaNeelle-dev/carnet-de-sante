@@ -33,6 +33,16 @@
 
       <div class="app-form-row">
         <div class="app-form-group">
+          <label for="genre">Genre * </label>
+          <select [(ngModel)]="formData.genre" name="genre">
+            <option value="HOMME">Homme</option>
+            <option value="FEMME">Femme</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="app-form-row">
+        <div class="app-form-group">
           <label for="nom">Nom *</label>
           <input
             type="text"

@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="765d2143-cd24-4bdf-8e8d-625ed1596b42" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="765d2143-cd24-4bdf-8e8d-625ed1596b42" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -73,7 +71,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.CarnetDeSanteApplication.executor": "Run",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "appmod/java-upgrade-20260328152623",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/damie/Bureau/Perso/Ynov/Projet_fin_d_etudes/carnet-de-sante",
@@ -162,6 +160,7 @@
       <workItem from="1771602763978" duration="5073000" />
       <workItem from="1773407395244" duration="3037000" />
       <workItem from="1774608942520" duration="1574000" />
+      <workItem from="1775210167936" duration="120000" />
     </task>
     <servers />
   </component>

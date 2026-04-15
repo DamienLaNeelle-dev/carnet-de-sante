@@ -35,6 +35,7 @@ public class UserService {
 
         Patient patient = Patient.builder()
                 .user(user)
+                .genre(request.getGenre())
                 .nom(request.getNom())
                 .prenom(request.getPrenom())
                 .dateNaissance(request.getDateNaissance())

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 interface RegisterPayload {
   email: string;
   password: string;
+  genre: string;
   nom: string;
   prenom: string;
   dateNaissance: string;
@@ -24,6 +25,7 @@ export class RegisterComponent {
   formData: RegisterPayload = {
     email: '',
     password: '',
+    genre: '',
     nom: '',
     prenom: '',
     dateNaissance: '',

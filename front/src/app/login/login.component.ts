@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 interface LoginResponse {
   token: string;
@@ -23,7 +24,7 @@ export class LoginComponent {
   errorMessage = '';
 
   constructor(
-    private readonly http: HttpClient,
+    private readonly authService: AuthService,
     private readonly router: Router,
   ) {}
 
@@ -38,41 +39,31 @@ export class LoginComponent {
 
     this.isSubmitting = true;
 
-    this.http
-      .post<LoginResponse>('/api/auth/login', {
-        email: this.email,
-        password: this.password,
-      })
-      .subscribe({
-        next: (data) => {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('email', data.email);
-          localStorage.setItem('role', data.role);
-          localStorage.setItem('userId', String(data.userId));
+    this.authService.login(this.email, this.password).subscribe({
+      next: (data) => {
+        if (data.role === 'PATIENT') {
+          this.router.navigateByUrl('/dashboard');
+          return;
+        }
 
-          if (data.role === 'PATIENT') {
-            this.router.navigateByUrl('/dashboard');
-            return;
-          }
+        if (data.role === 'ADMIN') {
+          this.router.navigateByUrl('/admin/dashboard');
+          return;
+        }
 
-          if (data.role === 'ADMIN') {
-            this.router.navigateByUrl('/admin/dashboard');
-            return;
-          }
-
-          this.router.navigateByUrl('/');
-        },
-        error: (error) => {
-          if (error?.status === 401 || error?.status === 403) {
-            this.errorMessage = 'Email ou mot de passe incorrect.';
-          } else {
-            this.errorMessage = 'Erreur de connexion au serveur.';
-          }
-          this.isSubmitting = false;
-        },
-        complete: () => {
-          this.isSubmitting = false;
-        },
-      });
+        this.router.navigateByUrl('/');
+      },
+      error: (error) => {
+        if (error?.status === 401 || error?.status === 403) {
+          this.errorMessage = 'Email ou mot de passe incorrect.';
+        } else {
+          this.errorMessage = 'Erreur de connexion au serveur.';
+        }
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      },
+    });
   }
 }

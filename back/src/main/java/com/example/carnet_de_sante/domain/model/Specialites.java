@@ -1,0 +1,19 @@
+package com.example.carnet_de_sante.domain.model;
+
+public enum Specialites {
+    GENERALISTE,
+    CARDIOLOGUE,
+    DERMATOLOGUE,
+    NEUROLOGUE,
+    PEDIATRE,
+    GYNECOLOGUE,
+    OPHTALMOLOGUE,
+    ORTHOPEDISTE,
+    PSYCHIATRE,
+    RADIOLOGUE,
+    UROLOGUE,
+    ENDOCRINOLOGUE,
+    GASTRO_ENTEROLOGUE,
+    PNEUMOLOGUE,
+    RHUMATOLOGUE
+}

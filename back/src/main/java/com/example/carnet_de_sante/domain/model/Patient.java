@@ -24,6 +24,10 @@ public class Patient {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "genre", length = 10)
+    private Genre genre;
+
     @Column(nullable = false, length = 100)
     private String nom;
 
@@ -42,6 +46,10 @@ public class Patient {
 
     @Column(name = "contact_urgence")
     private String contactUrgence;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "medecin_id")
+    private Medecin medecinTraitant;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
