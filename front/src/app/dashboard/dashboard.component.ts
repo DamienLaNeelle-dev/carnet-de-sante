@@ -1,7 +1,14 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpEvent,
+  HttpEventType,
+} from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MedecinService } from '../medecin.service';
 
 interface Patient {
@@ -21,9 +28,18 @@ interface Medecin {
   numeroRpps: string;
 }
 
+interface PatientFile {
+  id: number;
+  fileName: string;
+  filePath: string;
+  fileType: string;
+  fileSize: number;
+  uploadedAt: string;
+}
+
 @Component({
   selector: 'app-dashboard',
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe, DecimalPipe, SlicePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -32,6 +48,14 @@ export class DashboardComponent implements OnInit {
   private userId = localStorage.getItem('userId');
   userEmail = localStorage.getItem('email') ?? '';
   hasMedecinTraitant = false;
+  fileName = '';
+  uploadProgress = 0;
+  isUploading = false;
+  uploadError = '';
+  files: PatientFile[] = [];
+  selectedFile: PatientFile | null = null;
+  previewUrl: SafeResourceUrl | null = null;
+  isDragging = false;
 
   get currentToken(): string | null {
     return localStorage.getItem('token');
@@ -55,6 +79,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private readonly http: HttpClient,
     private readonly router: Router,
+    private readonly sanitizer: DomSanitizer,
     private medecinService: MedecinService,
   ) {
     this.medecinService.getMedecins().subscribe({
@@ -73,6 +98,7 @@ export class DashboardComponent implements OnInit {
     this.loadPatientInfo();
     this.loadMedecins();
     this.loadMedecinInfo();
+    this.loadFiles();
   }
 
   loadPatientInfo(): void {
@@ -250,6 +276,143 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  loadFiles(): void {
+    if (!this.currentUserId || !this.currentToken) {
+      console.log('loadFiles: userId ou token manquant', {
+        userId: this.currentUserId,
+        hasToken: !!this.currentToken,
+      });
+      return;
+    }
+
+    console.log('loadFiles: Appel API avec userId =', this.currentUserId);
+    this.http
+      .get<PatientFile[]>(`/api/files/${this.currentUserId}`, {
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${this.currentToken}`,
+        }),
+      })
+      .subscribe({
+        next: (files) => {
+          console.log('loadFiles: Réponse reçue -', files);
+          this.files = files;
+          console.log(
+            'loadFiles: files array mis à jour -',
+            this.files.length,
+            'fichiers',
+          );
+        },
+        error: (error) => {
+          console.error('Erreur lors du chargement des fichiers', error);
+        },
+      });
+  }
+
+  downloadFile(file: PatientFile): void {
+    if (!this.currentToken) {
+      return;
+    }
+
+    this.http
+      .get(`/api/files/download/${file.id}`, {
+        responseType: 'blob',
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${this.currentToken}`,
+        }),
+      })
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = file.fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Erreur lors du téléchargement du fichier', error);
+        },
+      });
+  }
+
+  openFile(file: PatientFile): void {
+    if (!this.currentToken) {
+      return;
+    }
+
+    this.selectedFile = file;
+
+    this.http
+      .get(`/api/files/download/${file.id}`, {
+        responseType: 'blob',
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${this.currentToken}`,
+        }),
+      })
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        },
+        error: (error) => {
+          console.error("Erreur lors de l'ouverture du fichier", error);
+        },
+      });
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const fakeEvent = { target: { files: files } };
+      this.fileSended(fakeEvent);
+    }
+  }
+
+  deleteFile(file: PatientFile): void {
+    if (!this.currentToken) {
+      return;
+    }
+
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+      return;
+    }
+
+    this.http
+      .delete(`/api/files/${file.id}`, {
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${this.currentToken}`,
+        }),
+      })
+      .subscribe({
+        next: () => {
+          this.files = this.files.filter((f) => f.id !== file.id);
+          this.selectedFile = null;
+          this.previewUrl = null;
+        },
+        error: (error) => {
+          console.error('Erreur lors de la suppression du fichier', error);
+          alert('Erreur lors de la suppression');
+        },
+      });
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
@@ -257,4 +420,112 @@ export class DashboardComponent implements OnInit {
     localStorage.removeItem('role');
     this.router.navigateByUrl('/login');
   }
+
+  fileSended(event: any): void {
+    const uploadedFile = event.target.files[0] as globalThis.File;
+
+    if (!uploadedFile) {
+      return;
+    }
+
+    console.log(
+      'fileSended: Fichier sélectionné -',
+      uploadedFile.name,
+      uploadedFile.size,
+      'bytes',
+    );
+
+    // Vérifier que c'est un PDF
+    if (
+      !uploadedFile.type.includes('pdf') &&
+      !uploadedFile.name.toLowerCase().endsWith('.pdf')
+    ) {
+      this.uploadError = 'Veuillez sélectionner un fichier PDF';
+      console.error('fileSended: Erreur - fichier non-PDF');
+      return;
+    }
+
+    // Vérifier la taille (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (uploadedFile.size > maxSize) {
+      this.uploadError = 'Le fichier doit faire moins de 10MB';
+      console.error('fileSended: Erreur - fichier trop gros');
+      return;
+    }
+
+    this.fileName = uploadedFile.name;
+    this.uploadError = '';
+    this.isUploading = true;
+    this.uploadProgress = 0;
+
+    const formData = new FormData();
+    formData.append('thumbnail', uploadedFile);
+    formData.append('patientId', this.currentUserId || '');
+
+    console.log(
+      'fileSended: Envoi du fichier avec patientId =',
+      this.currentUserId,
+    );
+
+    this.http
+      .post<HttpEvent<any>>('/api/thumbnail-upload', formData, {
+        reportProgress: true,
+        observe: 'events',
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${this.currentToken}`,
+        }),
+      })
+      .subscribe({
+        next: (httpEvent: HttpEvent<any>) => {
+          if (httpEvent.type === HttpEventType.UploadProgress) {
+            this.uploadProgress = Math.round(
+              (httpEvent.loaded! / httpEvent.total!) * 100,
+            );
+          } else if (httpEvent.type === HttpEventType.Response) {
+            console.log(
+              'fileSended: Upload completed, response:',
+              httpEvent.body,
+            );
+            this.uploadProgress = 100;
+            this.isUploading = false;
+            this.fileName = 'Fichier envoyé avec succès !';
+
+            // Réinitialiser l'input fichier
+            const fileInput = document.querySelector(
+              'input[type="file"]',
+            ) as HTMLInputElement;
+            if (fileInput) {
+              fileInput.value = '';
+            }
+
+            // Charger les documents après un délai pour s'assurer que le serveur a traité le fichier
+            setTimeout(() => {
+              console.log('fileSended: Appel loadFiles après 800ms');
+              this.loadFiles();
+              this.uploadProgress = 0;
+              this.fileName = '';
+            }, 800);
+          }
+        },
+        error: (error: any) => {
+          console.error("fileSended: Erreur lors de l'envoi -", error);
+          this.isUploading = false;
+          this.uploadProgress = 0;
+          this.uploadError = "Erreur lors de l'envoi du fichier";
+        },
+      });
+  }
+
+  cancelUpload(): void {
+    this.uploadProgress = 0;
+    this.isUploading = false;
+    this.fileName = '';
+  }
+
+  // sendFileByService(){
+  //   this.sendFileService.postFile(this.fileToSend).subscribe(resultat => {
+  //     console.log('Fichier envoyé avec succès', resultat);
+  // }, error => {
+  //   console.error('Erreur lors de l\'envoi du fichier', error);
+  // }
 }

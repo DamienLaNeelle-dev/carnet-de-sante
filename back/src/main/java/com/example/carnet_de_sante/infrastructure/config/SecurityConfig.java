@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/patients/**").permitAll()
                         .requestMatchers("/api/medecins/**").permitAll()
+                        .requestMatchers("/api/thumbnail-upload").permitAll()
+                        .requestMatchers("/api/files/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
