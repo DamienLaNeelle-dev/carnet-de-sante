@@ -1,3 +1,24 @@
+@use "../../styles/_global" as *;
+@use "../../styles/_directions" as *;
+
 .error-message {
   color: #b91c1c;
+}
+
+.informations {
+  background-color: #f9b9c3;
+  padding: 10vh 5vw;
+  border-top-right-radius: 50px;
+  border-bottom-left-radius: 50px;
+  border-top-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.medecin-traitant-container {
+  background-color: #84a9c0;
+  padding: 10vh 5vw;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-top-left-radius: 50px;
+  border-bottom-right-radius: 50px;
 }

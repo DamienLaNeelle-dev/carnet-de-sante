@@ -1,4 +1,4 @@
-<header class="dashboard-header">
+<header class="dashboard-header container mt-5">
   <div class="app-container">
     <div class="header-content">
       <h1 class="title">Mon Carnet de Sante</h1>
@@ -8,12 +8,12 @@
 </header>
 
 <main class="dashboard-main">
-  <div class="app-container">
+  <div class="app-container space-between container mt-5">
     @if (errorMessage) {
       <p class="error-message">{{ errorMessage }}</p>
     }
 
-    <section class="dashboard-section">
+    <section class="dashboard-section informations">
       <h2 class="title">Mes informations</h2>
       <div class="info-card">
         <div class="info-row">
@@ -53,63 +53,136 @@
       </div>
     </section>
 
-    <section class="dashboard-section">
-      <h2 class="title">Mon médecin traitant</h2>
-      <div class="medecin-traitant">
-        @if (medecin) {
-          <div class="info-card">
-            <div class="info-row">
-              <span class="info-label">Nom : </span>
-              <span class="info-value">{{ medecin.nom }}</span>
+    <div class="medecin-traitant-container app-column">
+      <section class="dashboard-section">
+        <h2 class="title">Mon médecin traitant</h2>
+        <div class="medecin-traitant">
+          @if (medecin) {
+            <div class="info-card">
+              <div class="info-row">
+                <span class="info-label">Nom : </span>
+                <span class="info-value">{{ medecin.nom }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Prénom : </span>
+                <span class="info-value">{{ medecin.prenom }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Numéro RPPS : </span>
+                <span class="info-value">{{ medecin.numeroRpps }}</span>
+              </div>
             </div>
-            <div class="info-row">
-              <span class="info-label">Prénom : </span>
-              <span class="info-value">{{ medecin.prenom }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Numéro RPPS : </span>
-              <span class="info-value">{{ medecin.numeroRpps }}</span>
+            <button
+              type="button"
+              class="app-btn"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              Modifier le médecin traitant
+            </button>
+          } @else {
+            <!-- Button trigger modal -->
+            <button
+              type="button"
+              class="app-btn"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              Ajouter un médecin traitant
+            </button>
+          }
+        </div>
+
+        <!-- Modal (en dehors du @if/@else pour être toujours accessible) -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                  @if (medecin) {
+                    Modifier un médecin traitant
+                  } @else {
+                    Ajouter un médecin traitant
+                  }
+                </h1>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <label for="medecin">Nom du médecin</label>
+                <input
+                  type="text"
+                  id="medecin"
+                  class="form-control"
+                  placeholder="Commencez à taper le nom du médecin"
+                  [value]="searchQuery"
+                  (input)="filterMedecins($any($event.target).value)"
+                  required
+                />
+                @if (filteredMedecins.length > 0) {
+                  <ul class="list-group mt-2">
+                    @for (med of filteredMedecins; track med.id || med.nom) {
+                      <li
+                        class="list-group-item list-group-item-action"
+                        (click)="selectMedecin(med)"
+                        style="cursor: pointer"
+                      >
+                        <strong>{{ med.nom }} {{ med.prenom }}</strong>
+                        <br />
+                        <small class="text-muted">{{ med.specialite }}</small>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  [disabled]="!selectedMedecinInModal"
+                  (click)="saveMedecinTraitant(selectedMedecinInModal!)"
+                  aria-label="Close"
+                >
+                  @if (medecin) {
+                    Modifier
+                  } @else {
+                    Ajouter
+                  }
+                </button>
+              </div>
             </div>
           </div>
-          <button
-            type="button"
-            class="app-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-          >
-            Modifier le médecin traitant
-          </button>
-        } @else {
-          <!-- Button trigger modal -->
-          <button
-            type="button"
-            class="app-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-          >
-            Ajouter un médecin traitant
-          </button>
-        }
-      </div>
+        </div>
+      </section>
 
-      <!-- Modal (en dehors du @if/@else pour être toujours accessible) -->
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
+      <section class="dashboard-section">
+        <h2 class="title">Mes documents</h2>
+        <button
+          type="button"
+          class="app-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#filesModal"
+        >
+          📎 Gérer mes documents
+        </button>
+      </section>
+
+      <!-- Modal pour gérer les fichiers -->
+      <div class="modal fade" id="filesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">
-                @if (medecin) {
-                  Modifier un médecin traitant
-                } @else {
-                  Ajouter un médecin traitant
-                }
-              </h1>
+              <h1 class="modal-title fs-5">Mes documents</h1>
               <button
                 type="button"
                 class="btn-close"
@@ -118,237 +191,168 @@
               ></button>
             </div>
             <div class="modal-body">
-              <label for="medecin">Nom du médecin</label>
-              <input
-                type="text"
-                id="medecin"
-                class="form-control"
-                placeholder="Commencez à taper le nom du médecin"
-                [value]="searchQuery"
-                (input)="filterMedecins($any($event.target).value)"
-                required
-              />
-              @if (filteredMedecins.length > 0) {
-                <ul class="list-group mt-2">
-                  @for (med of filteredMedecins; track med.id || med.nom) {
-                    <li
-                      class="list-group-item list-group-item-action"
-                      (click)="selectMedecin(med)"
-                      style="cursor: pointer"
-                    >
-                      <strong>{{ med.nom }} {{ med.prenom }}</strong>
-                      <br />
-                      <small class="text-muted">{{ med.specialite }}</small>
-                    </li>
-                  }
-                </ul>
-              }
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-primary"
-                [disabled]="!selectedMedecinInModal"
-                (click)="saveMedecinTraitant(selectedMedecinInModal!)"
-                aria-label="Close"
-              >
-                @if (medecin) {
-                  Modifier
-                } @else {
-                  Ajouter
-                }
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="dashboard-section">
-      <h2 class="title">Mes documents</h2>
-      <button
-        type="button"
-        class="app-btn"
-        data-bs-toggle="modal"
-        data-bs-target="#filesModal"
-      >
-        📎 Gérer mes documents
-      </button>
-    </section>
-
-    <!-- Modal pour gérer les fichiers -->
-    <div class="modal fade" id="filesModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5">Mes documents</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <!-- Zone d'upload -->
-              <div class="col-md-4">
-                <h6 class="mb-3">Dépôt de documents</h6>
-                <div
-                  class="p-4 text-center"
-                  style="
-                    border: 2px dashed #ccc;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    background-color: #f9f9f9;
-                  "
-                  [class.bg-light]="isDragging"
-                  (dragover)="onDragOver($event)"
-                  (dragleave)="onDragLeave($event)"
-                  (drop)="onDrop($event)"
-                  (click)="fileUploadRef.click()"
-                >
-                  <input
-                    type="file"
-                    #fileUploadRef
-                    (change)="fileSended($event)"
-                    accept=".pdf"
-                    style="display: none"
-                    multiple
-                  />
-                  <div class="mb-2">
-                    <i
-                      class="bi bi-cloud-arrow-up"
-                      style="font-size: 2rem; color: #0d6efd"
-                    ></i>
-                  </div>
-                  <p class="mb-1"><strong>Déposez vos fichiers ici</strong></p>
-                  <small class="text-muted"
-                    >ou cliquez pour sélectionner<br />(PDF, max 10MB)</small
+              <div class="row">
+                <!-- Zone d'upload -->
+                <div class="col-md-4">
+                  <h6 class="mb-3">Dépôt de documents</h6>
+                  <div
+                    class="p-4 text-center"
+                    style="
+                      border: 2px dashed #ccc;
+                      border-radius: 4px;
+                      cursor: pointer;
+                      background-color: #f9f9f9;
+                    "
+                    [class.bg-light]="isDragging"
+                    (dragover)="onDragOver($event)"
+                    (dragleave)="onDragLeave($event)"
+                    (drop)="onDrop($event)"
+                    (click)="fileUploadRef.click()"
                   >
+                    <input
+                      type="file"
+                      #fileUploadRef
+                      (change)="fileSended($event)"
+                      accept=".pdf"
+                      style="display: none"
+                      multiple
+                    />
+                    <div class="mb-2">
+                      <i
+                        class="bi bi-cloud-arrow-up"
+                        style="font-size: 2rem; color: #0d6efd"
+                      ></i>
+                    </div>
+                    <p class="mb-1">
+                      <strong>Déposez vos fichiers ici</strong>
+                    </p>
+                    <small class="text-muted"
+                      >ou cliquez pour sélectionner<br />(PDF, max 10MB)</small
+                    >
+                  </div>
+
+                  @if (fileName) {
+                    <div class="mt-3">
+                      <small class="text-muted">Fichier: {{ fileName }}</small>
+                    </div>
+                  }
+
+                  @if (uploadError) {
+                    <div class="alert alert-danger mt-3 mb-0" role="alert">
+                      {{ uploadError }}
+                    </div>
+                  }
+
+                  @if (uploadProgress > 0 && isUploading) {
+                    <div class="mt-3">
+                      <div class="progress">
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated"
+                          role="progressbar"
+                          [style.width.%]="uploadProgress"
+                          [attr.aria-valuenow]="uploadProgress"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          {{ uploadProgress }}%
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger mt-2 w-100"
+                        (click)="cancelUpload()"
+                      >
+                        ✕ Annuler
+                      </button>
+                    </div>
+                  }
                 </div>
 
-                @if (fileName) {
-                  <div class="mt-3">
-                    <small class="text-muted">Fichier: {{ fileName }}</small>
-                  </div>
-                }
-
-                @if (uploadError) {
-                  <div class="alert alert-danger mt-3 mb-0" role="alert">
-                    {{ uploadError }}
-                  </div>
-                }
-
-                @if (uploadProgress > 0 && isUploading) {
-                  <div class="mt-3">
-                    <div class="progress">
-                      <div
-                        class="progress-bar progress-bar-striped progress-bar-animated"
-                        role="progressbar"
-                        [style.width.%]="uploadProgress"
-                        [attr.aria-valuenow]="uploadProgress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      >
-                        {{ uploadProgress }}%
+                <!-- Liste et prévisualisation -->
+                <div class="col-md-8">
+                  @if (files.length > 0) {
+                    <h6 class="mb-3">Fichiers uploadés ({{ files.length }})</h6>
+                    <div class="row h-100">
+                      <!-- Liste des fichiers -->
+                      <div class="col-md-4">
+                        <div
+                          class="list-group"
+                          style="max-height: 400px; overflow-y: auto"
+                        >
+                          @for (file of files; track file.id) {
+                            <div
+                              class="list-group-item list-group-item-action p-2"
+                              [class.active]="selectedFile?.id === file.id"
+                              (click)="openFile(file)"
+                              style="cursor: pointer"
+                            >
+                              <h6 class="mb-1" style="font-size: 0.85rem">
+                                <i class="bi bi-file-pdf"></i>
+                                {{ file.fileName | slice: 0 : 18
+                                }}{{ file.fileName.length > 18 ? "..." : "" }}
+                              </h6>
+                              <small class="text-muted d-block">
+                                {{ file.uploadedAt | date: "dd/MM/yyyy" }}
+                              </small>
+                              <small class="text-muted d-block">
+                                {{
+                                  file.fileSize / 1024 / 1024 | number: "1.1-1"
+                                }}
+                                MB
+                              </small>
+                            </div>
+                          }
+                        </div>
                       </div>
-                    </div>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-danger mt-2 w-100"
-                      (click)="cancelUpload()"
-                    >
-                      ✕ Annuler
-                    </button>
-                  </div>
-                }
-              </div>
 
-              <!-- Liste et prévisualisation -->
-              <div class="col-md-8">
-                @if (files.length > 0) {
-                  <h6 class="mb-3">Fichiers uploadés ({{ files.length }})</h6>
-                  <div class="row h-100">
-                    <!-- Liste des fichiers -->
-                    <div class="col-md-4">
-                      <div
-                        class="list-group"
-                        style="max-height: 400px; overflow-y: auto"
-                      >
-                        @for (file of files; track file.id) {
-                          <div
-                            class="list-group-item list-group-item-action p-2"
-                            [class.active]="selectedFile?.id === file.id"
-                            (click)="openFile(file)"
-                            style="cursor: pointer"
-                          >
-                            <h6 class="mb-1" style="font-size: 0.85rem">
-                              <i class="bi bi-file-pdf"></i>
-                              {{ file.fileName | slice: 0 : 18
-                              }}{{ file.fileName.length > 18 ? "..." : "" }}
+                      <!-- Prévisualisation du PDF -->
+                      <div class="col-md-8">
+                        @if (selectedFile && previewUrl) {
+                          <div class="pdf-viewer">
+                            <h6 class="mb-3">
+                              {{ selectedFile.fileName }}
                             </h6>
-                            <small class="text-muted d-block">
-                              {{ file.uploadedAt | date: "dd/MM/yyyy" }}
-                            </small>
-                            <small class="text-muted d-block">
-                              {{
-                                file.fileSize / 1024 / 1024 | number: "1.1-1"
-                              }}
-                              MB
-                            </small>
+                            <iframe
+                              [src]="previewUrl"
+                              style="
+                                width: 100%;
+                                height: 350px;
+                                border: 1px solid #dee2e6;
+                                border-radius: 4px;
+                              "
+                              title="PDF Preview"
+                            ></iframe>
+                            <div class="mt-3 d-flex gap-2">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-primary flex-grow-1"
+                                (click)="downloadFile(selectedFile)"
+                              >
+                                📥 Télécharger
+                              </button>
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-danger"
+                                (click)="deleteFile(selectedFile)"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </div>
+                        } @else if (files.length > 0) {
+                          <div class="alert alert-secondary">
+                            Cliquez sur un fichier pour le prévisualiser
                           </div>
                         }
                       </div>
                     </div>
-
-                    <!-- Prévisualisation du PDF -->
-                    <div class="col-md-8">
-                      @if (selectedFile && previewUrl) {
-                        <div class="pdf-viewer">
-                          <h6 class="mb-3">
-                            {{ selectedFile.fileName }}
-                          </h6>
-                          <iframe
-                            [src]="previewUrl"
-                            style="
-                              width: 100%;
-                              height: 350px;
-                              border: 1px solid #dee2e6;
-                              border-radius: 4px;
-                            "
-                            title="PDF Preview"
-                          ></iframe>
-                          <div class="mt-3 d-flex gap-2">
-                            <button
-                              type="button"
-                              class="btn btn-sm btn-primary flex-grow-1"
-                              (click)="downloadFile(selectedFile)"
-                            >
-                              📥 Télécharger
-                            </button>
-                            <button
-                              type="button"
-                              class="btn btn-sm btn-danger"
-                              (click)="deleteFile(selectedFile)"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
-                      } @else if (files.length > 0) {
-                        <div class="alert alert-secondary">
-                          Cliquez sur un fichier pour le prévisualiser
-                        </div>
-                      }
+                  } @else {
+                    <div class="alert alert-info">
+                      Aucun fichier pour le moment. Déposez un fichier à gauche
+                      pour en ajouter un !
                     </div>
-                  </div>
-                } @else {
-                  <div class="alert alert-info">
-                    Aucun fichier pour le moment. Déposez un fichier à gauche
-                    pour en ajouter un !
-                  </div>
-                }
+                  }
+                </div>
               </div>
             </div>
           </div>
