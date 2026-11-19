@@ -30,9 +30,9 @@
         />
       </div>
 
-      @if (errorMessage) {
+      <ng-container *ngIf="errorMessage">
         <p class="error-message">{{ errorMessage }}</p>
-      }
+      </ng-container>
 
       <div class="form-actions">
         <button type="submit" class="app-btn" [disabled]="isSubmitting">

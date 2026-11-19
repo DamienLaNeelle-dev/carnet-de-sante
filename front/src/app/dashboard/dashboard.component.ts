@@ -4,11 +4,18 @@ import {
   HttpEvent,
   HttpEventType,
 } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AuthService } from '../auth.service';
 import { MedecinService } from '../medecin.service';
 
 interface Patient {
@@ -39,13 +46,15 @@ interface PatientFile {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [FormsModule, DatePipe, DecimalPipe, SlicePipe],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss',
+  styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
-  private token = localStorage.getItem('token');
-  private userId = localStorage.getItem('userId');
+export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('medecinModalClose')
+  private medecinModalClose!: ElementRef<HTMLButtonElement>;
+
   userEmail = localStorage.getItem('email') ?? '';
   hasMedecinTraitant = false;
   fileName = '';
@@ -56,6 +65,9 @@ export class DashboardComponent implements OnInit {
   selectedFile: PatientFile | null = null;
   previewUrl: SafeResourceUrl | null = null;
   isDragging = false;
+  activeSection: 'informations' | 'documents' | 'rdv' = 'informations';
+
+  private currentBlobUrl: string | null = null;
 
   get currentToken(): string | null {
     return localStorage.getItem('token');
@@ -70,23 +82,25 @@ export class DashboardComponent implements OnInit {
   isLoading = true;
   errorMessage = 'Patient non trouve.';
 
-  medecin: Medecin | null = null; // Médecin assigné au patient
+  medecin: Medecin | null = null;
   medecins: Medecin[] = [];
   searchQuery = '';
   filteredMedecins: Medecin[] = [];
-  selectedMedecinInModal: Medecin | null = null; // Médecin temporaire dans la modale
+  selectedMedecinInModal: Medecin | null = null;
+
+  title = 'front';
+  isLoggedIn = false;
 
   constructor(
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly sanitizer: DomSanitizer,
-    private medecinService: MedecinService,
+    private authService: AuthService,
+    private readonly medecinService: MedecinService,
   ) {
-    this.medecinService.getMedecins().subscribe({
-      next: (medecins) => {
-        this.medecins = medecins;
-      },
-    });
+    this.authService
+      .isLoggedIn()
+      .subscribe((val: boolean) => (this.isLoggedIn = val));
   }
 
   ngOnInit(): void {
@@ -101,6 +115,12 @@ export class DashboardComponent implements OnInit {
     this.loadFiles();
   }
 
+  ngOnDestroy(): void {
+    if (this.currentBlobUrl) {
+      window.URL.revokeObjectURL(this.currentBlobUrl);
+    }
+  }
+
   loadPatientInfo(): void {
     if (!this.currentToken || !this.currentUserId) {
       this.router.navigateByUrl('/login');
@@ -113,7 +133,7 @@ export class DashboardComponent implements OnInit {
     this.http
       .get<Patient>(`/api/patients/by-user/${this.currentUserId}`, {
         headers: new HttpHeaders({
-          Authorization: `Bearer ${this.token}`,
+          Authorization: `Bearer ${this.currentToken}`,
         }),
       })
       .subscribe({
@@ -154,9 +174,7 @@ export class DashboardComponent implements OnInit {
         error: (error) => {
           if (error?.status === 401) {
             this.logout();
-            return;
           }
-          // Pas d'affichage d'erreur si aucun médecin trouvé, c'est normal
         },
       });
   }
@@ -182,10 +200,6 @@ export class DashboardComponent implements OnInit {
   }
 
   saveMedecinTraitant(medecin: Medecin): void {
-    console.log('saveMedecinTraitant appelée avec:', medecin);
-    console.log('currentToken:', this.currentToken);
-    console.log('currentUserId:', this.currentUserId);
-
     this.http
       .post(
         `/api/patients/${this.currentUserId}/medecin-traitant`,
@@ -198,32 +212,15 @@ export class DashboardComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          console.log('Réponse reçue du serveur');
           this.medecin = this.selectedMedecinInModal;
-          console.log('this.medecin assigné à:', this.medecin);
-
-          // Fermer la modale en cliquant le bouton de fermeture
-          const closeButton = document.querySelector(
-            '[data-bs-dismiss="modal"]',
-          ) as HTMLButtonElement | null;
-          if (closeButton) {
-            console.log('Clic sur le bouton de fermeture');
-            closeButton.click();
-          }
-
-          // Réinitialiser l'état après un léger délai
-          setTimeout(() => {
-            this.searchQuery = '';
-            this.filteredMedecins = [];
-            this.selectedMedecinInModal = null;
-            console.log('État réinitialisé');
-          }, 100);
+          this.medecinModalClose.nativeElement.click();
+          this.searchQuery = '';
+          this.filteredMedecins = [];
+          this.selectedMedecinInModal = null;
         },
         error: (error) => {
-          console.error('Erreur HTTP:', error);
           if (error?.status === 401) {
             this.logout();
-            return;
           }
         },
       });
@@ -265,10 +262,11 @@ export class DashboardComponent implements OnInit {
   }
 
   loadMedecins(): void {
-    this.http.get<Medecin[]>(`/api/medecins`).subscribe({
+    this.medecinService.getMedecins().subscribe({
       next: (medecins) => {
-        // Filtrer pour ne garder que les généralistes
-        this.medecins = medecins.filter((m) => m.specialite === 'GENERALISTE');
+        this.medecins = medecins.filter(
+          (m: Medecin) => m.specialite === 'GENERALISTE',
+        );
       },
       error: (error) => {
         console.error('Erreur lors du chargement des medecins', error);
@@ -278,14 +276,9 @@ export class DashboardComponent implements OnInit {
 
   loadFiles(): void {
     if (!this.currentUserId || !this.currentToken) {
-      console.log('loadFiles: userId ou token manquant', {
-        userId: this.currentUserId,
-        hasToken: !!this.currentToken,
-      });
       return;
     }
 
-    console.log('loadFiles: Appel API avec userId =', this.currentUserId);
     this.http
       .get<PatientFile[]>(`/api/files/${this.currentUserId}`, {
         headers: new HttpHeaders({
@@ -294,13 +287,7 @@ export class DashboardComponent implements OnInit {
       })
       .subscribe({
         next: (files) => {
-          console.log('loadFiles: Réponse reçue -', files);
           this.files = files;
-          console.log(
-            'loadFiles: files array mis à jour -',
-            this.files.length,
-            'fichiers',
-          );
         },
         error: (error) => {
           console.error('Erreur lors du chargement des fichiers', error);
@@ -340,6 +327,11 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
+    if (this.currentBlobUrl) {
+      window.URL.revokeObjectURL(this.currentBlobUrl);
+      this.currentBlobUrl = null;
+    }
+
     this.selectedFile = file;
 
     this.http
@@ -352,6 +344,7 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: (blob) => {
           const url = window.URL.createObjectURL(blob);
+          this.currentBlobUrl = url;
           this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
         },
         error: (error) => {
@@ -379,7 +372,6 @@ export class DashboardComponent implements OnInit {
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
-      const file = files[0];
       const fakeEvent = { target: { files: files } };
       this.fileSended(fakeEvent);
     }
@@ -403,8 +395,14 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: () => {
           this.files = this.files.filter((f) => f.id !== file.id);
-          this.selectedFile = null;
-          this.previewUrl = null;
+          if (this.selectedFile?.id === file.id) {
+            this.selectedFile = null;
+            if (this.currentBlobUrl) {
+              window.URL.revokeObjectURL(this.currentBlobUrl);
+              this.currentBlobUrl = null;
+            }
+            this.previewUrl = null;
+          }
         },
         error: (error) => {
           console.error('Erreur lors de la suppression du fichier', error);
@@ -413,12 +411,9 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('email');
-    localStorage.removeItem('role');
-    this.router.navigateByUrl('/login');
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   fileSended(event: any): void {
@@ -428,28 +423,17 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    console.log(
-      'fileSended: Fichier sélectionné -',
-      uploadedFile.name,
-      uploadedFile.size,
-      'bytes',
-    );
-
-    // Vérifier que c'est un PDF
     if (
       !uploadedFile.type.includes('pdf') &&
       !uploadedFile.name.toLowerCase().endsWith('.pdf')
     ) {
       this.uploadError = 'Veuillez sélectionner un fichier PDF';
-      console.error('fileSended: Erreur - fichier non-PDF');
       return;
     }
 
-    // Vérifier la taille (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     if (uploadedFile.size > maxSize) {
       this.uploadError = 'Le fichier doit faire moins de 10MB';
-      console.error('fileSended: Erreur - fichier trop gros');
       return;
     }
 
@@ -461,11 +445,6 @@ export class DashboardComponent implements OnInit {
     const formData = new FormData();
     formData.append('thumbnail', uploadedFile);
     formData.append('patientId', this.currentUserId || '');
-
-    console.log(
-      'fileSended: Envoi du fichier avec patientId =',
-      this.currentUserId,
-    );
 
     this.http
       .post<HttpEvent<any>>('/api/thumbnail-upload', formData, {
@@ -482,15 +461,10 @@ export class DashboardComponent implements OnInit {
               (httpEvent.loaded! / httpEvent.total!) * 100,
             );
           } else if (httpEvent.type === HttpEventType.Response) {
-            console.log(
-              'fileSended: Upload completed, response:',
-              httpEvent.body,
-            );
             this.uploadProgress = 100;
             this.isUploading = false;
             this.fileName = 'Fichier envoyé avec succès !';
 
-            // Réinitialiser l'input fichier
             const fileInput = document.querySelector(
               'input[type="file"]',
             ) as HTMLInputElement;
@@ -498,9 +472,7 @@ export class DashboardComponent implements OnInit {
               fileInput.value = '';
             }
 
-            // Charger les documents après un délai pour s'assurer que le serveur a traité le fichier
             setTimeout(() => {
-              console.log('fileSended: Appel loadFiles après 800ms');
               this.loadFiles();
               this.uploadProgress = 0;
               this.fileName = '';
@@ -508,7 +480,7 @@ export class DashboardComponent implements OnInit {
           }
         },
         error: (error: any) => {
-          console.error("fileSended: Erreur lors de l'envoi -", error);
+          console.error("Erreur lors de l'envoi du fichier", error);
           this.isUploading = false;
           this.uploadProgress = 0;
           this.uploadError = "Erreur lors de l'envoi du fichier";
@@ -522,10 +494,18 @@ export class DashboardComponent implements OnInit {
     this.fileName = '';
   }
 
-  // sendFileByService(){
-  //   this.sendFileService.postFile(this.fileToSend).subscribe(resultat => {
-  //     console.log('Fichier envoyé avec succès', resultat);
-  // }, error => {
-  //   console.error('Erreur lors de l\'envoi du fichier', error);
-  // }
+  calculateAge(birthDate: Date | string | undefined): number {
+    if (!birthDate) return 0;
+    const date = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - date.getFullYear();
+    const monthDiff = today.getMonth() - date.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < date.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  }
 }

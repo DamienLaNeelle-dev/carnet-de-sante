@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CommonModule } from '@angular/common';
 
 import { RegisterComponent } from './register.component';
 
@@ -8,7 +9,7 @@ describe('RegisterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RegisterComponent],
+      imports: [RegisterComponent, CommonModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);

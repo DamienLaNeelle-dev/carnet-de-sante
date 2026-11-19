@@ -30,6 +30,6 @@ public class Medecin {
     @Column(name= "specialites", length = 100)
     private Specialites specialite;
 
-    @Column(nullable = false, length = 11)
+    @Column(length = 11)
     private String numeroRpps;
 }

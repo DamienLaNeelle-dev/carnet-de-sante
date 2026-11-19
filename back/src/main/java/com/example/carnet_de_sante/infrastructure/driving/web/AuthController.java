@@ -5,7 +5,6 @@ import com.example.carnet_de_sante.application.dto.LoginResponse;
 import com.example.carnet_de_sante.application.dto.RegisterPatientRequest;
 import com.example.carnet_de_sante.application.service.AuthService;
 import com.example.carnet_de_sante.application.service.UserService;
-import com.example.carnet_de_sante.domain.model.Patient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,10 +36,10 @@ public class AuthController {
     }
 
     @PostMapping("/register/patient")
-    public ResponseEntity<Patient> registerPatient(@Valid @RequestBody RegisterPatientRequest request) {
+    public ResponseEntity<Void> registerPatient(@Valid @RequestBody RegisterPatientRequest request) {
         try {
-            Patient patient = userService.creerPatient(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(patient);
+            userService.creerPatient(request);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }

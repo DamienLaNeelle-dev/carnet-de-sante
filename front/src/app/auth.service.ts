@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string;
   role: string;
   email: string;

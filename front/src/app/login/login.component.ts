@@ -1,21 +1,15 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
-interface LoginResponse {
-  token: string;
-  email: string;
-  role: string;
-  userId: string | number;
-}
-
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [CommonModule, NgIf, FormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   email = '';

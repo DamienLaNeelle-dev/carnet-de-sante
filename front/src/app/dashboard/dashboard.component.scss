@@ -1,24 +1,192 @@
-@use "../../styles/_global" as *;
-@use "../../styles/_directions" as *;
+@use "../../styles/global" as *;
+@use "../../styles/directions" as *;
 
 .error-message {
   color: #b91c1c;
 }
 
-.informations {
-  background-color: #f9b9c3;
-  padding: 10vh 5vw;
-  border-top-right-radius: 50px;
-  border-bottom-left-radius: 50px;
-  border-top-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+.main-content {
+  margin-top: 0;
+  overflow: hidden;
 }
 
-.medecin-traitant-container {
-  background-color: #84a9c0;
-  padding: 10vh 5vw;
-  border-top-right-radius: 20px;
+.side-menu-left {
+  background-color: $primary-color;
+  color: white;
+  width: 25vw;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  header {
+    margin: 2vh auto 0;
+    background-color: #065f5e;
+    height: 15vh;
+    width: 20vw;
+    border-radius: 20px;
+
+    .header-content {
+      margin: 2vw auto;
+      width: 17vw;
+    }
+
+    h4 {
+      margin-bottom: 5px;
+      color: white;
+      margin-top: 8px;
+    }
+
+    h6 {
+      font-weight: normal;
+      color: #74c2c1;
+    }
+  }
+  .trait {
+    margin: 2vh auto 0;
+    width: 95%;
+    height: 2px;
+    background-color: #065f5e;
+  }
+
+  .dashboard-menu {
+    margin-top: 2vh;
+
+    li {
+      list-style: none;
+      font-size: 1.2rem;
+    }
+    h6 {
+      font-weight: normal;
+      color: #74c2c1;
+    }
+
+    p {
+      font-weight: normal;
+      color: #74c2c1;
+    }
+
+    .dashboard-btn {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      display: flex;
+      color: white;
+      text-decoration: none;
+      padding: 1vh 2vw;
+      width: 14vw;
+      height: 6vh;
+      flex-direction: column;
+    }
+
+    .dashboard-btn:hover {
+      transform: scale(1.1);
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.side-menu-right {
+  background-color: $secondary-color;
+  color: $primary-color;
+  width: 80vw;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
-  border-top-left-radius: 50px;
-  border-bottom-right-radius: 50px;
+  position: relative;
+  right: 20px;
+}
+
+.patient-datas {
+  .name-info {
+    display: flex;
+    width: 51vw;
+    height: 10vh;
+    margin-bottom: 2.5vh;
+    align-items: center;
+
+    .info-row {
+      width: 90%;
+      font-size: 2rem;
+      font-family: $gill;
+      font-weight: bold;
+      color: $primary-color;
+    }
+  }
+
+  .infos {
+    width: 51vw;
+    height: 35vh;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: solid 1px $primary-color;
+    border-radius: 20px;
+    font-family: $gill;
+
+    .info-content {
+      width: 90%;
+    }
+    .info-row {
+      margin-top: 2vh;
+
+      .info-label {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .last-part {
+    display: flex;
+  }
+}
+
+.info-medecin {
+  width: 25vw;
+  height: 30vh;
+  margin-top: 2.5vh;
+  background-color: white;
+  border: solid 1px $primary-color;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .medecin-content {
+    width: 90%;
+
+    button {
+      margin-top: 1vh;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.row {
+  display: flex;
+  margin: 0;
+}
+
+.info-vaccin {
+  width: 25vw;
+  height: 30vh;
+  margin-top: 2.5vh;
+  background-color: white;
+  border: solid 1px $primary-color;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .vaccin-content {
+    width: 90%;
+
+    button {
+      margin-top: 1vh;
+      font-size: 1.2rem;
+    }
+  }
 }

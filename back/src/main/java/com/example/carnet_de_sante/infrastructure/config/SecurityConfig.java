@@ -5,6 +5,7 @@ import com.example.carnet_de_sante.infrastructure.security.JwtAuthenticationFilt
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,11 +39,11 @@ public class SecurityConfig {
                         .requestMatchers("/patient/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/patients/**").permitAll()
-                        .requestMatchers("/api/medecins/**").permitAll()
-                        .requestMatchers("/api/thumbnail-upload").permitAll()
-                        .requestMatchers("/api/files/**").permitAll()
+                        // Liste des médecins accessible publiquement (nécessaire à l'inscription)
+                        .requestMatchers(HttpMethod.GET, "/api/medecins").permitAll()
+                        // Seul le health check est public sur actuator
+                        .requestMatchers("/actuator/health").permitAll()
+                        // Toutes les autres routes exigent un token valide
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

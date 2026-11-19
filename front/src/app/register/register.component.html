@@ -16,6 +16,9 @@
           [(ngModel)]="formData.email"
           required
         />
+        <ng-container *ngIf="getFieldError('email')">
+          <span class="field-error">{{ getFieldError("email") }}</span>
+        </ng-container>
       </div>
 
       <div class="app-form-group">
@@ -29,6 +32,9 @@
           [(ngModel)]="formData.password"
           required
         />
+        <ng-container *ngIf="getFieldError('password')">
+          <span class="field-error">{{ getFieldError("password") }}</span>
+        </ng-container>
       </div>
 
       <div class="app-form-row">
@@ -52,6 +58,9 @@
             [(ngModel)]="formData.nom"
             required
           />
+          <ng-container *ngIf="getFieldError('nom')">
+            <span class="field-error">{{ getFieldError("nom") }}</span>
+          </ng-container>
         </div>
 
         <div class="app-form-group">
@@ -64,6 +73,9 @@
             [(ngModel)]="formData.prenom"
             required
           />
+          <ng-container *ngIf="getFieldError('prenom')">
+            <span class="field-error">{{ getFieldError("prenom") }}</span>
+          </ng-container>
         </div>
       </div>
 
@@ -76,6 +88,9 @@
           [(ngModel)]="formData.dateNaissance"
           required
         />
+        <ng-container *ngIf="getFieldError('dateNaissance')">
+          <span class="field-error">{{ getFieldError("dateNaissance") }}</span>
+        </ng-container>
       </div>
 
       <div class="app-form-group">
@@ -90,6 +105,9 @@
           [(ngModel)]="formData.numeroSecu"
           required
         />
+        <ng-container *ngIf="getFieldError('numeroSecu')">
+          <span class="field-error">{{ getFieldError("numeroSecu") }}</span>
+        </ng-container>
       </div>
 
       <div class="app-form-group">
@@ -122,13 +140,13 @@
         />
       </div>
 
-      @if (errorMessage) {
+      <ng-container *ngIf="errorMessage">
         <p class="error-message">{{ errorMessage }}</p>
-      }
+      </ng-container>
 
-      @if (successMessage) {
+      <ng-container *ngIf="successMessage">
         <p class="success-message">{{ successMessage }}</p>
-      }
+      </ng-container>
 
       <div class="form-actions">
         <button type="submit" class="app-btn" [disabled]="isSubmitting">
